@@ -121,7 +121,7 @@ class Attention(nn.Module):
 
         out = torch.matmul(attn, v)
         out = rearrange(out, 'b h n d -> b n (h d)')
-        return self.to_out(out)
+        return self.to_out(out), attn
 
 
 class Transformer(nn.Module):
@@ -137,7 +137,8 @@ class Transformer(nn.Module):
 
     def forward(self, x, z=None):
         for attn, ff in self.layers:
-            x = attn(x, z=z) + x
+            tx, _ = attn(x, z=z)
+            x = tx + x
             x = ff(x) + x
         return x
 
